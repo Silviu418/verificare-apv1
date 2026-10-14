@@ -1,0 +1,53 @@
+gradle
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ro.zeletin.verificareapv'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'ro.zeletin.verificareapv'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+
+    // cheie fixă: fiecare versiune nouă a APK-ului se instalează peste cea veche,
+    // fără să se piardă verificările salvate pe telefon
+    signingConfigs {
+        apv {
+            storeFile file('verificare-apv.jks')
+            storePassword 'zeletin-apv'
+            keyAlias 'verificareapv'
+            keyPassword 'zeletin-apv'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.apv
+        }
+        debug {
+            signingConfig signingConfigs.apv
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    // aplicația se instalează direct pe telefon, nu prin Magazin Play:
+    // verificările automate pentru Magazin nu trebuie să oprească construirea
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    androidResources { noCompress 'html' }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+    implementation 'androidx.core:core:1.13.1'
+}
